@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2f3040">
+  <title>פתיחת צייד הדירות הישראלי</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(141,112,234,.28), transparent 32%),
+        linear-gradient(155deg, #323346, #232430);
+      color: #f7f5ff;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    main {
+      width: min(100%, 460px);
+      padding: 30px 24px;
+      border: 1px solid rgba(210,200,255,.22);
+      border-radius: 24px;
+      background: rgba(255,255,255,.065);
+      box-shadow: 0 22px 55px rgba(0,0,0,.28);
+      text-align: center;
+    }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 16px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #8d70ea, #b89cff);
+      font-size: 39px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: #b9a3ff;
+      font-size: clamp(30px, 8vw, 42px);
+      line-height: 1.08;
+    }
+    p {
+      margin: 0 auto 22px;
+      color: #d7d2e6;
+      font-size: 17px;
+      line-height: 1.55;
+    }
+    .actions { display: grid; gap: 12px; }
+    button, a.button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      width: 100%;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 14px;
+      color: #fff;
+      background: #7658db;
+      font: inherit;
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a.button.chrome { background: #2f6fed; }
+    .note {
+      margin-top: 18px;
+      color: #aaa5ba;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .status {
+      min-height: 21px;
+      margin: 12px 0 0;
+      color: #67dda0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="icon" aria-hidden="true">🏠</div>
+    <h1>צייד הדירות הישראלי</h1>
+    <p>בחרו איך לפתוח את ה-Gem. אם Google מבקש חשבון, בחרו את החשבון שלכם והמשיכו.</p>
+
+    <div class="actions">
+      <button id="open-web" type="button">פתיחת ה-Gem בדפדפן</button>
+      <a id="open-chrome" class="button chrome" href="#">פתיחה ב-Chrome</a>
+    </div>
+
+    <div id="status" class="status" aria-live="polite"></div>
+    <div class="note">העמוד לא שומר מידע ולא מבקש הרשאות.</div>
+  </main>
+
+  <script>
+    const gemUrl = "https://gemini.google.com/gem/1nWkgDgdSkZ-416mMR7to0h2iUZIlWW50?usp=sharing";
+    const fallback = encodeURIComponent(gemUrl);
+    const chromeIntent = "intent://gemini.google.com/gem/1nWkgDgdSkZ-416mMR7to0h2iUZIlWW50?usp=sharing#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + fallback + ";end";
+
+    document.getElementById("open-web").addEventListener("click", () => {
+      document.getElementById("status").textContent = "פותחים את ה-Gem...";
+      window.location.assign(gemUrl);
+    });
+
+    const chromeButton = document.getElementById("open-chrome");
+    chromeButton.href = chromeIntent;
+    chromeButton.addEventListener("click", () => {
+      document.getElementById("status").textContent = "פותחים ב-Chrome...";
+    });
+  </script>
+</body>
+</html>
