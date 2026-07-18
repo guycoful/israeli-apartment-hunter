@@ -50,6 +50,16 @@
       font-size: 17px;
       line-height: 1.55;
     }
+    .steps {
+      margin: 0 0 22px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      color: #e9e5f5;
+      text-align: right;
+      font-size: 16px;
+      line-height: 1.7;
+    }
     .actions { display: grid; gap: 12px; }
     button, a.button {
       display: flex;
@@ -68,7 +78,27 @@
       text-decoration: none;
       cursor: pointer;
     }
-    a.button.chrome { background: #2f6fed; }
+    button.share { background: #2f6fed; }
+    a.button.direct {
+      border: 1px solid rgba(210,200,255,.34);
+      background: rgba(255,255,255,.08);
+      color: #ddd6f5;
+      font-size: 16px;
+    }
+    .link-box {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px 12px;
+      border: 1px solid rgba(210,200,255,.25);
+      border-radius: 12px;
+      background: rgba(0,0,0,.17);
+      color: #c8c1df;
+      direction: ltr;
+      font-size: 12px;
+      text-align: left;
+      overflow-wrap: anywhere;
+      user-select: all;
+    }
     .note {
       margin-top: 18px;
       color: #aaa5ba;
@@ -88,31 +118,63 @@
   <main>
     <div class="icon" aria-hidden="true">🏠</div>
     <h1>צייד הדירות הישראלי</h1>
-    <p>בחרו איך לפתוח את ה-Gem. אם Google מבקש חשבון, בחרו את החשבון שלכם והמשיכו.</p>
+    <p>Adobe לא מאפשר לעמוד הזה לכפות פתיחה ב-Chrome. המסלול הבא עובד גם כשהקישור נפתח בתוך Adobe:</p>
 
-    <div class="actions">
-      <button id="open-web" type="button">פתיחת ה-Gem בדפדפן</button>
-      <a id="open-chrome" class="button chrome" href="#">פתיחה ב-Chrome</a>
+    <div class="steps">
+      1. לחצו על העתקת הקישור.<br>
+      2. פתחו בעצמכם את Chrome והתחברו ל-Gemini.<br>
+      3. הדביקו את הקישור בשורת הכתובת.
     </div>
 
+    <div class="actions">
+      <button id="copy-link" type="button">העתקת הקישור ל-Gem</button>
+      <button id="share-link" class="share" type="button">שיתוף הקישור דרך הטלפון</button>
+      <a class="button direct" href="https://gemini.google.com/gem/c07f9911fc3c?usp=sharing" target="_blank" rel="noopener">כבר מחוברים ל-Gemini? פתיחה ישירה</a>
+    </div>
+
+    <div class="link-box">https://gemini.google.com/gem/c07f9911fc3c?usp=sharing</div>
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="note">העמוד לא שומר מידע ולא מבקש הרשאות.</div>
+    <div class="note">העמוד לא שומר מידע. אם תפריט השיתוף לא זמין, הכפתור יעתיק את הקישור.</div>
   </main>
 
   <script>
-    const gemUrl = "https://gemini.google.com/gem/1nWkgDgdSkZ-416mMR7to0h2iUZIlWW50?usp=sharing";
-    const fallback = encodeURIComponent(gemUrl);
-    const chromeIntent = "intent://gemini.google.com/gem/1nWkgDgdSkZ-416mMR7to0h2iUZIlWW50?usp=sharing#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + fallback + ";end";
+    const gemUrl = "https://gemini.google.com/gem/c07f9911fc3c?usp=sharing";
+    const status = document.getElementById("status");
 
-    document.getElementById("open-web").addEventListener("click", () => {
-      document.getElementById("status").textContent = "פותחים את ה-Gem...";
-      window.location.assign(gemUrl);
-    });
+    async function copyGemLink() {
+      try {
+        await navigator.clipboard.writeText(gemUrl);
+      } catch (error) {
+        const field = document.createElement("textarea");
+        field.value = gemUrl;
+        field.setAttribute("readonly", "");
+        field.style.position = "fixed";
+        field.style.opacity = "0";
+        document.body.appendChild(field);
+        field.select();
+        document.execCommand("copy");
+        field.remove();
+      }
+      status.textContent = "הקישור הועתק. פתחו Chrome והדביקו אותו בשורת הכתובת.";
+    }
 
-    const chromeButton = document.getElementById("open-chrome");
-    chromeButton.href = chromeIntent;
-    chromeButton.addEventListener("click", () => {
-      document.getElementById("status").textContent = "פותחים ב-Chrome...";
+    document.getElementById("copy-link").addEventListener("click", copyGemLink);
+
+    document.getElementById("share-link").addEventListener("click", async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "צייד הדירות הישראלי",
+            text: "פתיחת צייד הדירות הישראלי ב-Gemini",
+            url: gemUrl
+          });
+          status.textContent = "הקישור נשלח לתפריט השיתוף של הטלפון.";
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+      await copyGemLink();
     });
   </script>
 </body>
