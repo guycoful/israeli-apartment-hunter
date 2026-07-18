@@ -96,8 +96,7 @@
       direction: ltr;
       font-size: 12px;
       text-align: left;
-      overflow-wrap: anywhere;
-      user-select: all;
+      outline: none;
     }
     .note {
       margin-top: 18px;
@@ -121,18 +120,18 @@
     <p>Adobe לא מאפשר לעמוד הזה לכפות פתיחה ב-Chrome. המסלול הבא עובד גם כשהקישור נפתח בתוך Adobe:</p>
 
     <div class="steps">
-      1. לחצו על העתקת הקישור.<br>
+      1. לחצו על העתקה או סימון הקישור.<br>
       2. פתחו בעצמכם את Chrome והתחברו ל-Gemini.<br>
       3. הדביקו את הקישור בשורת הכתובת.
     </div>
 
     <div class="actions">
-      <button id="copy-link" type="button">העתקת הקישור ל-Gem</button>
+      <button id="copy-link" type="button">העתקה או סימון הקישור</button>
       <button id="share-link" class="share" type="button">שיתוף הקישור דרך הטלפון</button>
       <a class="button direct" href="https://gemini.google.com/gem/c07f9911fc3c?usp=sharing" target="_blank" rel="noopener">כבר מחוברים ל-Gemini? פתיחה ישירה</a>
     </div>
 
-    <div class="link-box">https://gemini.google.com/gem/c07f9911fc3c?usp=sharing</div>
+    <input id="gem-link" class="link-box" type="text" readonly value="https://gemini.google.com/gem/c07f9911fc3c?usp=sharing" aria-label="הקישור ל-Gem">
     <div id="status" class="status" aria-live="polite"></div>
     <div class="note">העמוד לא שומר מידע. אם תפריט השיתוף לא זמין, הכפתור יעתיק את הקישור.</div>
   </main>
@@ -140,22 +139,20 @@
   <script>
     const gemUrl = "https://gemini.google.com/gem/c07f9911fc3c?usp=sharing";
     const status = document.getElementById("status");
+    const linkField = document.getElementById("gem-link");
 
     async function copyGemLink() {
+      linkField.focus();
+      linkField.select();
+      linkField.setSelectionRange(0, linkField.value.length);
+      status.textContent = "הקישור סומן. אם הוא לא הועתק, לחצו עליו לחיצה ארוכה ובחרו העתקה.";
+
       try {
         await navigator.clipboard.writeText(gemUrl);
+        status.textContent = "הקישור הועתק. פתחו Chrome והדביקו אותו בשורת הכתובת.";
       } catch (error) {
-        const field = document.createElement("textarea");
-        field.value = gemUrl;
-        field.setAttribute("readonly", "");
-        field.style.position = "fixed";
-        field.style.opacity = "0";
-        document.body.appendChild(field);
-        field.select();
-        document.execCommand("copy");
-        field.remove();
+        status.textContent = "הקישור סומן. לחצו עליו לחיצה ארוכה ובחרו העתקה.";
       }
-      status.textContent = "הקישור הועתק. פתחו Chrome והדביקו אותו בשורת הכתובת.";
     }
 
     document.getElementById("copy-link").addEventListener("click", copyGemLink);
